@@ -1,0 +1,9 @@
+﻿
+@using Mvc.CascadeDropDown
+@model Mvc.CascadeDropDown.Test.Models.CascadingDropdownsModel
+           
+@Html.DropDownListFor(m=>m.SelectedCountry, Model.Countries,"Please select a Country", new {@class="form-control"})
+
+@Html.CascadingDropDownListFor(m => m.SelectedCity, m => m.SelectedCountry, Url.Action("GetCities", "Home"), "country", "Please select a City", true, new { @class = "form-control" })
+
+@Html.CascadingDropDownListFor(m => m.SelectedStreet, m => m.SelectedCity, Url.Action("GetStreets", "Home"), "city", "Please select a Street", true, new { @class = "form-control" })
