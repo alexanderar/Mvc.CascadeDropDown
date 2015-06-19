@@ -29,6 +29,9 @@ namespace Mvc.CascadeDropDown.Test.Controllers
                             Value = "UK"
                         },
                     },
+                    SelectedCountry = "US",
+                    SelectedCity = "New York",
+                    SelectedStreet = "New York Street 2"
             };
             return View(model);
         }

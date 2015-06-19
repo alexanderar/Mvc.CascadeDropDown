@@ -122,8 +122,6 @@ $(function() {{
 </script>";
 
 
-
-
         public static MvcHtmlString CascadingDropDownList<TModel, TProperty>(
             this HtmlHelper htmlHelper,
             string inputName,
@@ -164,9 +162,6 @@ $(function() {{
             bool disabledWhenParentNotSelected = false,
             object htmlAttributes = null)
         {
-            RouteValueDictionary dictionary = htmlAttributes != null
-                ? HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes)
-                : new RouteValueDictionary();
 
             return CascadingDropDownList(
                 htmlHelper,
@@ -175,9 +170,42 @@ $(function() {{
                 triggeredByProperty,
                 url,
                 ajaxActionParamName,
+                GetPropStringValue(htmlHelper.ViewData.Model, inputName),
                 optionLabel,
                 disabledWhenParentNotSelected,
-                dictionary);
+                htmlAttributes != null
+                ? HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes)
+                : new RouteValueDictionary());
+        }
+
+        private static string GetPropStringValue(object src, string propName)
+        {
+            string stringVal = null;
+            if (src != null)
+            {
+                object propVal = src.GetType().GetProperty(propName).GetValue(src, null);
+                stringVal = propVal != null ? propVal.ToString() : null;
+            }
+            return stringVal;
+        }
+
+        private static string GetPropStringValue<TModel, TProp>(TModel src, Expression<Func<TModel, TProp>> expression)
+        {
+            Func<TModel, TProp> func = expression.Compile();
+            string selectedValString = string.Empty;
+            if (src != null)
+            {
+                TProp propVal = func(src);
+                string defaultValString = typeof (TProp).IsValueType
+                    ? Activator.CreateInstance(typeof (TProp)).ToString()
+                    : string.Empty;
+                if ((defaultValString != String.Empty && propVal.ToString() != defaultValString) ||
+                    (defaultValString == String.Empty && propVal != null))
+                {
+                    selectedValString = propVal.ToString();
+                }
+            }
+            return selectedValString;
         }
 
         public static MvcHtmlString CascadingDropDownListFor<TModel, TProperty>(
@@ -203,8 +231,8 @@ $(function() {{
                 throw new ArgumentException("triggeredByProperty argument is invalid");
             }
 
-            var dropDownElementName = dropDownElement.Name;
-            var dropDownElementId = GetDropDownElementId(htmlAttributes) ?? dropDownElement.Name;  
+            string dropDownElementName = dropDownElement.Name;
+            string dropDownElementId = GetDropDownElementId(htmlAttributes) ?? dropDownElement.Name;
 
             return CascadingDropDownList(htmlHelper,
                 dropDownElementName,
@@ -212,9 +240,12 @@ $(function() {{
                 triggerMemberInfo.Name,
                 url,
                 ajaxActionParamName,
+                GetPropStringValue(htmlHelper.ViewData.Model, expression),
                 optionLabel,
                 disabledWhenParrentNotSelected,
-                htmlAttributes);
+                htmlAttributes != null
+                ? HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes)
+                : new RouteValueDictionary());
         }
 
         public static MvcHtmlString CascadingDropDownListFor<TModel, TProperty>(
@@ -234,8 +265,8 @@ $(function() {{
                 throw new ArgumentException("expression argument is invalid");
             }
 
-            var dropDownElementName = dropDownElement.Name;
-            var dropDownElementId = GetDropDownElementId(htmlAttributes) ?? dropDownElement.Name;           
+            string dropDownElementName = dropDownElement.Name;
+            string dropDownElementId = GetDropDownElementId(htmlAttributes) ?? dropDownElement.Name;
 
             return CascadingDropDownList(
                 htmlHelper,
@@ -244,17 +275,20 @@ $(function() {{
                 triggeredByPropertyWithId,
                 url,
                 ajaxActionParamName,
+                GetPropStringValue(htmlHelper.ViewData.Model, expression),
                 optionLabel,
                 disabledWhenParentNotSelected,
-                htmlAttributes);
+                htmlAttributes != null
+                ? HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes)
+                : new RouteValueDictionary());
         }
 
         private static string GetDropDownElementId(object htmlAttributes)
         {
             if (htmlAttributes != null)
             {
-                var properties = htmlAttributes.GetType().GetProperties();
-                var prop = properties.FirstOrDefault(p => p.Name.ToUpperInvariant() == "ID");
+                PropertyInfo[] properties = htmlAttributes.GetType().GetProperties();
+                PropertyInfo prop = properties.FirstOrDefault(p => p.Name.ToUpperInvariant() == "ID");
                 if (prop != null)
                 {
                     return prop.GetValue(htmlAttributes, null).ToString();
@@ -270,6 +304,31 @@ $(function() {{
             string triggeredByProperty,
             string url,
             string ajaxActionParamName,
+            string optionLabel = "",
+            bool disabledWhenParentNotSelected = false,
+            RouteValueDictionary htmlAttributes = null)
+        {
+            return CascadingDropDownList(
+               htmlHelper,
+               inputName,
+               inputId,
+               triggeredByProperty,
+               url,
+               ajaxActionParamName,
+               GetPropStringValue(htmlHelper.ViewData.Model, inputName),
+               optionLabel,
+               disabledWhenParentNotSelected,
+               htmlAttributes);
+        }
+
+        private static MvcHtmlString CascadingDropDownList(
+            this HtmlHelper htmlHelper,
+            string inputName,
+            string inputId,
+            string triggeredByProperty,
+            string url,
+            string ajaxActionParamName,
+            string selectedValue,
             string optionLabel = "",
             bool disabledWhenParentNotSelected = false,
             RouteValueDictionary htmlAttributes = null)
@@ -292,18 +351,6 @@ $(function() {{
 
             string script;
 
-            Type type = htmlHelper.ViewData.Model.GetType();
-            object defaultVal = type.IsValueType ? Activator.CreateInstance(type) : null;
-            string modelValue = string.Empty;
-            if (defaultVal != null || htmlHelper.ViewData.Model != null)
-            {
-                if (defaultVal != null &&
-                    !htmlHelper.ViewData.Model.ToString().Equals(defaultVal.ToString(), StringComparison.Ordinal))
-                {
-                    modelValue = htmlHelper.ViewData.Model.ToString();
-                }
-            }
-
             if (disabledWhenParentNotSelected)
             {
                 script = string.Format(
@@ -313,7 +360,7 @@ $(function() {{
                     ajaxActionParamName,
                     optionLabel,
                     inputId,
-                    modelValue,
+                    selectedValue,
                     "targetElement.setAttribute('disabled','disabled');",
                     "targetElement.removeAttribute('disabled');");
             }
@@ -326,7 +373,7 @@ $(function() {{
                     ajaxActionParamName,
                     optionLabel,
                     inputId,
-                    modelValue,
+                    selectedValue,
                     string.Empty,
                     string.Empty);
             }
