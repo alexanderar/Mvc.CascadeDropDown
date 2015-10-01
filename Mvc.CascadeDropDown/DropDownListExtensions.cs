@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -54,18 +54,29 @@ $(function() {{
         ///     6 - if element should be disabled when parent not selected, will contain setAttribute('disabled','disabled')
         ///     command
         ///     7 - if element was initially disabled, will contain removeAttribute('disabled') command
+        ///     8 - second parameter element
         /// </remarks>
         private const string PureJsScriptFormat = @"<script>       
     function initCascadeDropDownFor{4}() {{
         var triggerElement = document.getElementById('{0}');
         var targetElement = document.getElementById('{4}');
+        var triggerElement2;
+        if('{9}' !== '')
+            triggerElement2= document.getElementById('{9}');
         var preselectedValue = '{5}';
         triggerElement.addEventListener('change', function(e) {{
             {7}
             var value = triggerElement.value;
-            var items = '<option value="""">{3}</option>';            
+            var value2 = '';
+            if(triggerElement2)
+                value2 = triggerElement2.value;
+            var y;
+            for(y=targetElement.options.length-1;y>=0;y--)
+                {{
+                    targetElement.remove(y);
+                }}
+            targetElement.options[0] = new Option('{3}', '');       
             if (!value) {{
-                targetElement.innerHTML = items;
                 targetElement.value = '';                
                 var event = document.createEvent('HTMLEvents');
                 event.initEvent('change', true, false);
@@ -74,6 +85,8 @@ $(function() {{
                 return;
             }}
             var url = '{1}?{2}=' + value;
+            if(value2)
+                url += '&{8}=' + value2;
             var request = new XMLHttpRequest();
             request.open('GET', url, true);
             var isSelected = false;
@@ -82,10 +95,9 @@ $(function() {{
                     // Success!
                     var data = JSON.parse(request.responseText);
                     if (data) {{                        
-                        data.forEach(function(item, i) {{                              
-                            items += '<option value=""' + item.Value + '"">' + item.Text + '</option>';                                
+                        data.forEach(function(item, i) {{     
+                            targetElement.options[targetElement.options.length] = new Option(item.Text, item.Value);                      
                         }});
-                        targetElement.innerHTML = items;  
                         if(preselectedValue)
                         {{                           
                             targetElement.value = preselectedValue;                            
@@ -196,8 +208,8 @@ $(function() {{
             if (src != null)
             {
                 TProp propVal = func(src);
-                string defaultValString = typeof (TProp).IsValueType
-                    ? Activator.CreateInstance(typeof (TProp)).ToString()
+                string defaultValString = typeof(TProp).IsValueType
+                    ? Activator.CreateInstance(typeof(TProp)).ToString()
                     : string.Empty;
                 if ((defaultValString != String.Empty && propVal.ToString() != defaultValString) ||
                     (defaultValString == String.Empty && propVal != null))
@@ -342,7 +354,20 @@ $(function() {{
 
                 htmlAttributes.Add("disabled", "disabled");
             }
-
+            string param2 = "";
+            if (ajaxActionParamName.Contains(","))
+            {
+                var list = ajaxActionParamName.Split(',');
+                ajaxActionParamName = list[0];
+                param2 = list[1];
+            }
+            string source2 = "";
+            if (triggeredByProperty.Contains(","))
+            {
+                var list = triggeredByProperty.Split(',');
+                triggeredByProperty = list[0];
+                source2 = list[1];
+            }
             MvcHtmlString defaultDropDownHtml = htmlHelper.DropDownList(
                 inputName,
                 new List<SelectListItem>(),
@@ -362,7 +387,9 @@ $(function() {{
                     inputId,
                     selectedValue,
                     "targetElement.setAttribute('disabled','disabled');",
-                    "targetElement.removeAttribute('disabled');");
+                    "targetElement.removeAttribute('disabled');",
+                    param2,
+                    source2);
             }
             else
             {
@@ -375,7 +402,9 @@ $(function() {{
                     inputId,
                     selectedValue,
                     string.Empty,
-                    string.Empty);
+                    string.Empty,
+                    param2,
+                    source2);
             }
 
             string spanEventHandler = "<span id='" + inputId + "evenhHandler'></span>";
