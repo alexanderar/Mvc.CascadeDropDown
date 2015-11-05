@@ -196,7 +196,7 @@ $(function() {{
             if (src != null)
             {
                 TProp propVal = func(src);
-                string defaultValString = typeof (TProp).IsValueType
+                string defaultValString = typeof (TProp).IsValueType && Nullable.GetUnderlyingType(typeof (TProp)) == null
                     ? Activator.CreateInstance(typeof (TProp)).ToString()
                     : string.Empty;
                 if ((defaultValString != String.Empty && propVal.ToString() != defaultValString) ||
