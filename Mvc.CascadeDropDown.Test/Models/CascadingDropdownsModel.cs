@@ -15,7 +15,7 @@ namespace Mvc.CascadeDropDown.Test.Models
 
         public string SelectedCity { get; set; }
 
-        public string SelectedStreet { get; set; }
+        public int? SelectedStreet { get; set; }
 
     }
 }

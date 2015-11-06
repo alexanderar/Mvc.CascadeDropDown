@@ -31,7 +31,7 @@ namespace Mvc.CascadeDropDown.Test.Controllers
                     },
                     SelectedCountry = "US",
                     SelectedCity = "New York",
-                    SelectedStreet = "New York Street 2"
+                    //SelectedStreet = 2
             };
             return View(model);
         }
@@ -67,9 +67,9 @@ namespace Mvc.CascadeDropDown.Test.Controllers
         {
             var streets = new List<SelectListItem>
             {
-                new SelectListItem {Text = city + " Street 1", Value = city + " Street 1"},
-                new SelectListItem {Text = city + " Street 2", Value = city + " Street 2"},
-                new SelectListItem {Text = city + " Street 3", Value = city + " Street 3"}
+                new SelectListItem {Text = city + " Street 1", Value = "1"},
+                new SelectListItem {Text = city + " Street 2", Value = "2"},
+                new SelectListItem {Text = city + " Street 3", Value = "3"}
             };
 
             return Json(streets, JsonRequestBehavior.AllowGet);

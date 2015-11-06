@@ -208,10 +208,10 @@ $(function() {{
             return selectedValString;
         }
 
-        public static MvcHtmlString CascadingDropDownListFor<TModel, TProperty>(
+        public static MvcHtmlString CascadingDropDownListFor<TModel, TProperty, TProperty2>(
             this HtmlHelper<TModel> htmlHelper,
             Expression<Func<TModel, TProperty>> expression,
-            Expression<Func<TModel, TProperty>> triggeredByProperty,
+            Expression<Func<TModel, TProperty2>> triggeredByProperty,
             string url,
             string ajaxActionParamName,
             string optionLabel = "",
