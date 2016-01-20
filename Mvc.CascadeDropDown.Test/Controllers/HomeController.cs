@@ -42,7 +42,7 @@ namespace Mvc.CascadeDropDown.Test.Controllers
             {
                 var cities = new List<SelectListItem>
                 {
-                    new SelectListItem {Text = "New York", Value = "New York"},
+                    new SelectListItem {Text = "New York", Value = "New York", Selected = true},
                     new SelectListItem {Text = "Los Angeles", Value = "Los Angeles"},
                     new SelectListItem {Text = "Boston", Value = "Boston"}
                 };
