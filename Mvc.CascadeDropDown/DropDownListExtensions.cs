@@ -32,9 +32,13 @@ $(function() {{
         $.getJSON(url + '?{2}=' + $('#{0}').val(), function (data) {{
             
             $.each(data, function (i, d) {{
-                items += ""<option value='"" + d.Value + ""'>"" + d.Text + ""</option>"";
+                if (d.Selected) {{
+                    items += ""<option value='"" + d.Value + "" ' selected>"" + d.Text + ""</option>"";
+                }} else {{
+                    items += ""<option value='"" + d.Value + ""'>"" + d.Text + ""</option>"";
+                }}
             }});
-            $('#{4}').html(items);                
+            $('#{4}').html(items); 
         }});
     }});
 }});
@@ -83,7 +87,11 @@ $(function() {{
                     var data = JSON.parse(request.responseText);
                     if (data) {{                        
                         data.forEach(function(item, i) {{                              
-                            items += '<option value=""' + item.Value + '"">' + item.Text + '</option>';                                
+                            if (item.Selected == true) {{
+                                items += '<option value=""' + item.Value + '"" selected>' + item.Text + '</option>';
+                            }} else {{
+                                items += '<option value=""' + item.Value + '"">' + item.Text + '</option>';
+                            }}
                         }});
                         targetElement.innerHTML = items;  
                         if(preselectedValue)
