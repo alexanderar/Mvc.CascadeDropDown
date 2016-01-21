@@ -32,11 +32,11 @@ $(function() {{
         $.getJSON(url + '?{2}=' + $('#{0}').val(), function (data) {{
             
             $.each(data, function (i, d) {{
-                if(d.Selected) {
+                if (d.Selected) {{
                     items += ""<option value='"" + d.Value + "" ' selected>"" + d.Text + ""</option>"";
-                } else {
+                }} else {{
                     items += ""<option value='"" + d.Value + ""'>"" + d.Text + ""</option>"";
-                }
+                }}
             }});
             $('#{4}').html(items); 
         }});
