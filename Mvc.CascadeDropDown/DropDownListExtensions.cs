@@ -60,15 +60,18 @@ $(function() {{
         var triggerElement = document.getElementById('{0}');
         var targetElement = document.getElementById('{4}');
         var preselectedValue = '{5}';
-        triggerElement.addEventListener('change', function(e) {{
+        //triggerElement.addEventListener('change', function(e) {{
+        triggerElement.onchange = function(e) {{
             var value = triggerElement.value;
             var items = '<option value="""">{3}</option>';            
             if (!value) {{
                 targetElement.innerHTML = items;
                 targetElement.value = '';                
-                var event = document.createEvent('HTMLEvents');
-                event.initEvent('change', true, false);
-                targetElement.dispatchEvent(event);
+                setTimeout(function(){{
+					var event = document.createEvent('HTMLEvents');
+					event.initEvent('change', true, false);
+					targetElement.dispatchEvent(event);
+				}}, 10);
                 {6}
                 return;
             }}
@@ -95,9 +98,11 @@ $(function() {{
                             preselectedValue = null;                           
                         }}  
 						{7}
-                        var event = document.createEvent('HTMLEvents');
-                        event.initEvent('change', true, false);
-                        targetElement.dispatchEvent(event);                                                                                          
+						setTimeout(function(){{
+							var event = document.createEvent('HTMLEvents');
+							event.initEvent('change', true, false);
+							targetElement.dispatchEvent(event);
+						}}, 10);
                     }}
                 }} else {{
                     console.log(request.statusText);
@@ -109,8 +114,9 @@ $(function() {{
             }};
 
             request.send();
-        }});
-        if(triggerElement.value && !targetElement.value)
+        }};
+        
+		if(triggerElement.value && !targetElement.value)
         {{
             var event = document.createEvent('HTMLEvents');
             event.initEvent('change', true, false);
