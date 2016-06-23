@@ -61,7 +61,6 @@ $(function() {{
         var targetElement = document.getElementById('{4}');
         var preselectedValue = '{5}';
         triggerElement.addEventListener('change', function(e) {{
-            {7}
             var value = triggerElement.value;
             var items = '<option value="""">{3}</option>';            
             if (!value) {{
@@ -86,11 +85,16 @@ $(function() {{
                             items += '<option value=""' + item.Value + '"">' + item.Text + '</option>';                                
                         }});
                         targetElement.innerHTML = items;  
-                        if(preselectedValue)
+                        if(data.length == 1)
+						{{
+							preselectedValue = data[0].Value;
+						}}
+						if(preselectedValue)
                         {{                           
                             targetElement.value = preselectedValue;                            
                             preselectedValue = null;                           
                         }}  
+						{7}
                         var event = document.createEvent('HTMLEvents');
                         event.initEvent('change', true, false);
                         targetElement.dispatchEvent(event);                                                                                          
