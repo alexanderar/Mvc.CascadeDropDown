@@ -21,3 +21,8 @@
     //Dropdown list for SelectedStreet property that depends on selection of SelectedCity property
     @Html.CascadingDropDownListFor(m => m.SelectedStreet, m => m.SelectedCity, 
     Url.Action("GetStreets", "Home"), "city", "Please select a Street", true, new { @class = "form-control" })
+    
+    
+## Versions:
+### v1.3.2:
+  * Added support for disabled options
