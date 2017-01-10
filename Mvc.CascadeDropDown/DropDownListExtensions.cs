@@ -85,7 +85,12 @@ $(function() {{
 					var data = JSON.parse(request.responseText);
 					if (data) {{
 						data.forEach(function(item, i) {{
-							targetElement.options[targetElement.options.length] = new Option(item.Text, item.Value);
+							var opt = new Option(item.Text, item.Value);
+							if(item.Disabled)
+							{{
+								opt.disabled = true;
+							}}
+							targetElement.options[targetElement.options.length] = opt;
 						}});
 						if(data.length == 1)
 						{{

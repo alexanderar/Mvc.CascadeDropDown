@@ -44,7 +44,8 @@ namespace Mvc.CascadeDropDown.Test.Controllers
                 {
                     new SelectListItem {Text = "New York", Value = "New York"},
                     new SelectListItem {Text = "Los Angeles", Value = "Los Angeles"},
-                    new SelectListItem {Text = "Boston", Value = "Boston"}
+                    new SelectListItem {Text = "Boston", Value = "Boston"},
+                    new SelectListItem {Text = "Boston Disabled", Value = "Boston Disabled", Disabled = true}
                 };
                 return Json(cities, JsonRequestBehavior.AllowGet);
             }
