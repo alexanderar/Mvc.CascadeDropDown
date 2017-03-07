@@ -13,7 +13,7 @@
           expression: m => m.SelectedCity, 
           triggeredByProperty: m => m.SelectedCountry,  //Parent property that trigers dropdown data loading
           url: Url.Action("GetCities", "Home"),  //Url of action that returns dropdown data
-          actionParam: "country",   //Parameter name for the selected parent value that url action receives
+          ajaxActionParamName: "country",   //Parameter name for the selected parent value that url action receives
           optionLabel: "Please select a City", // Option label
           disabledWhenParrentNotSelected: true, //If true, disables dropdown until parrent dropdown selected
           htmlAttributes: new { @class = "form-control" }) //Html attributes
