@@ -36,15 +36,15 @@ namespace Mvc.CascadeDropDown.Test.Controllers
             return View(model);
         }
 
-        public ActionResult GetCities(string country)
+        public ActionResult GetCities(string country, string currency)
         {
             if (country == "US")
             {
                 var cities = new List<SelectListItem>
                 {
                     new SelectListItem {Text = "New York", Value = "New York"},
-                    new SelectListItem {Text = "Los Angeles", Value = "Los Angeles"},
-                    new SelectListItem {Text = "Boston", Value = "Boston"}
+                    new SelectListItem {Text = "Los Angeles", Value = "Los Angeles", Disabled = true},
+                    new SelectListItem {Text = "Boston", Value = "Boston", Selected = true}
                 };
                 return Json(cities, JsonRequestBehavior.AllowGet);
             }
@@ -73,6 +73,16 @@ namespace Mvc.CascadeDropDown.Test.Controllers
             };
 
             return Json(streets, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult CascadingDropDownTest(CascadingDropdownsModel model)
+        {
+            if(!ModelState.IsValid)
+            {
+                return this.View(model);
+            }
+            return RedirectToAction("CascadingDropDownTest");
         }
     }
 }
