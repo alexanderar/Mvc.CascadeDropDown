@@ -57,12 +57,16 @@
                                     HttpMethod = "post",
                                     OnCompleteGetData = "onComplete",
                                     OnFailureGetData = "onFailure",
-                                    OnSuccessGetData = "onSuccess"
+                                    OnSuccessGetData = "onSuccess",
+                                    EnableMinification = true
                                 })
             @Html.ValidationMessageFor(m => m.SelectedCity)
         </div>
         <div class="form-group">
-            @Html.CascadingDropDownListFor(m => m.SelectedStreet, m => m.SelectedCity, Url.Action("GetStreets", "Home"), "city", "Please select a Street", true, new { @class = "form-control" })
+            @Html.CascadingDropDownListFor(m => m.SelectedStreet, m => m.SelectedCity, Url.Action("GetStreets", "Home"), "city", "Please select a Street", true, new { @class = "form-control" }, new CascadeDropDownOptions
+       {
+           EnableMinification = true
+       })
             @Html.ValidationMessageFor(m => m.SelectedStreet)
         </div>
     </div>

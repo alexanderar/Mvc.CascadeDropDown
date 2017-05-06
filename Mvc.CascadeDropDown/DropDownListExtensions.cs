@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -20,8 +21,7 @@ namespace Mvc.CascadeDropDown
         /// 4 - if optionLabel is set should be set to '<option value="""">optionLabel</option>' otherwise should be set to ""
         /// 5 - if element should be disabled when parent not selected, will contain setAttribute('disabled','disabled') command
         /// </summary>
-        private const string Js1CreateInitFunction = @"<script>       
-    function initCascadeDropDownFor{0}() {{
+        private const string Js1CreateInitFunction = @"function initCascadeDropDownFor{0}() {{
         var triggerElement = document.getElementById('{1}');
         var targetElement = document.getElementById('{0}');
         var preselectedValue = '{2}';
@@ -147,8 +147,7 @@ if(updatedJson){{jsonToSend = updatedJson}}";
         initCascadeDropDownFor{0}();
     }} else {{
         document.addEventListener('DOMContentLoaded', initCascadeDropDownFor{0});
-    }}
-</script>";
+    }}";
 
         /// <summary>
         ///     The pure JavaScript  format.
@@ -434,17 +433,30 @@ if(updatedJson){{jsonToSend = updatedJson}}";
                 optionLabel,
                 htmlAttributes);
 
-            var cascadingDropDownStringBuilder = new StringBuilder(defaultDropDownHtml.ToString());
-            cascadingDropDownStringBuilder.AppendLine();
+            var scriptBuilder = new StringBuilder();
             var optionLblStr = optionLabel == null ? "''" : string.Format(@"'<option value="""">{0}</option>'", optionLabel);
-            cascadingDropDownStringBuilder.AppendFormat(Js1CreateInitFunction, cascadeDdElementId, triggeredByProperty, selectedValue, removeDisabledString, optionLblStr, setDisableString);
-            ApplyJsonToSendString(ref cascadingDropDownStringBuilder, ajaxActionParamName, options);
-            ApplyRequestString(ref cascadingDropDownStringBuilder, options);
-            ApplyOnLoadString(ref cascadingDropDownStringBuilder, options);
-            ApplyErrorCallbackString(ref cascadingDropDownStringBuilder, options);
-            ApplySendRequestString(ref cascadingDropDownStringBuilder, options);
-            cascadingDropDownStringBuilder.AppendFormat(Js7EndFormat, cascadeDdElementId);
-            return new MvcHtmlString(cascadingDropDownStringBuilder.ToString());
+            scriptBuilder.AppendFormat(Js1CreateInitFunction, cascadeDdElementId, triggeredByProperty, selectedValue, removeDisabledString, optionLblStr, setDisableString);
+            ApplyJsonToSendString(ref scriptBuilder, ajaxActionParamName, options);
+            ApplyRequestString(ref scriptBuilder, options);
+            ApplyOnLoadString(ref scriptBuilder, options);
+            ApplyErrorCallbackString(ref scriptBuilder, options);
+            ApplySendRequestString(ref scriptBuilder, options);
+            scriptBuilder.AppendFormat(Js7EndFormat, cascadeDdElementId);
+            string script;
+            if(options != null && options.EnableMinification)
+            {
+                var minifier = new WebMarkupMin.NUglify.NUglifyJsMinifier(new WebMarkupMin.NUglify.NUglifyJsMinificationSettings {
+                    LocalRenaming = WebMarkupMin.NUglify.LocalRenaming.CrunchAll,
+                    OutputMode = WebMarkupMin.NUglify.OutputMode.SingleLine
+                });
+                var minificationResult = minifier.Minify(scriptBuilder.ToString(), true);
+                script = string.Concat("<script>", minificationResult.MinifiedContent, "</script>");
+            }
+            else
+            {
+                script = string.Concat("<script>", scriptBuilder.ToString(), "</script>");
+            }
+            return new MvcHtmlString(string.Concat(defaultDropDownHtml.ToString(),Environment.NewLine, script));
         }
 
         private static void ApplyJsonToSendString(ref StringBuilder builder, string ajaxParam, CascadeDropDownOptions options)
@@ -456,7 +468,7 @@ if(updatedJson){{jsonToSend = updatedJson}}";
 
         private static void ApplyRequestString(ref StringBuilder builder, CascadeDropDownOptions options)
         {
-            builder.Append(options == null || !options.HttpMethod.Equals("POST", StringComparison.OrdinalIgnoreCase) ?
+            builder.Append(options == null || options.HttpMethod == null || !options.HttpMethod.Equals("POST", StringComparison.OrdinalIgnoreCase) ?
                 Js3InitializeGetRequest : Js3InitializePostRequest);
         }      
 
@@ -498,7 +510,7 @@ if(updatedJson){{jsonToSend = updatedJson}}";
 
         private static void ApplySendRequestString(ref StringBuilder builder, CascadeDropDownOptions options)
         {
-            builder.Append(options == null || !options.HttpMethod.Equals("POST", StringComparison.OrdinalIgnoreCase) ?
+            builder.Append(options == null || options.HttpMethod == null || !options.HttpMethod.Equals("POST", StringComparison.OrdinalIgnoreCase) ?
                 Js6SendGetRequest : Js6SendPostRequest);
         }
 
