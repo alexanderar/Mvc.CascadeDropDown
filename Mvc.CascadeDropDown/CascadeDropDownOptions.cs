@@ -4,13 +4,14 @@
     {
         /// <summary>
         /// Gets or sets the JavaScript function to call after the data is successfully loaded.
-        /// This function could be used to modify the loaded data before it is used to fill the drop down. 
+        /// This function could be used to modify the loaded data before it's used to fill the drop down. 
         /// The format of the data should remain the same
         /// </summary>
         public string OnSuccessGetData { get; set; }
 
         /// <summary>
         /// Gets or sets the JavaScript function to call if get data request results with failure.
+        /// The function receives the following parameters: responseText, responseStatus, statusText
         /// </summary>
         public string OnFailureGetData { get; set; }
 

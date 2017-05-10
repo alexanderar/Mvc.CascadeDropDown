@@ -1,0 +1,69 @@
+﻿
+@using Mvc.CascadeDropDown
+@model Mvc.CascadeDropDown.Test.Models.MultipleDependenciesModel
+
+
+<script>
+    function beforeSend(data) {
+        return {
+            make: $("#SelectedMake").val(),
+            year: $("#SelectedYear").val()
+        }
+    }
+
+    $(function () {
+        $(".parentDd").change(function () {
+            if ($("#SelectedMake").val() && $("#SelectedYear").val()) {
+                $("#makeYear").val(1);
+
+            }
+            else {
+                $("#makeYear").val(null);
+            }
+            //Will not work without dispatchEvent
+            var evt = document.createEvent("HTMLEvents");
+            evt.initEvent("change", false, true);
+            $("#makeYear")[0].dispatchEvent(evt);
+        })
+    })
+
+</script>
+
+
+
+@using (Html.BeginForm("MultipleDependencies", "Home", FormMethod.Post))
+{
+
+    <div class="form-horizontal">
+        <div class="form-group">
+            <label>MAKE</label>
+            @Html.DropDownListFor(m => m.SelectedMake, Model.Makes, "Please select a Make", new { @class = "form-control parentDd" })
+            @Html.ValidationMessageFor(m => m.SelectedMake)
+        </div>
+        <div class="form-group">
+            <label>YEAR</label>
+            @Html.DropDownListFor(m => m.SelectedYear, Model.Years, "Please select a Year", new { @class = "form-control parentDd" })
+            @Html.ValidationMessageFor(m => m.SelectedYear)
+        </div>
+        <input id="makeYear" type="hidden" />
+
+        <div class="form-group">
+            <label>MODEL</label>
+            @Html.CascadingDropDownListFor(expression: m => m.SelectedModel,
+                                triggeredByPropertyWithId: "makeYear",
+                                url: Url.Action("GetModel", "Home"),
+                                ajaxActionParamName: "make",
+                                disabledWhenParentNotSelected: true,
+                                htmlAttributes: new { @class = "form-control" },
+                                options: new CascadeDropDownOptions
+                                {
+                                    BeforeSend = "beforeSend"
+                                })
+            @Html.ValidationMessageFor(m => m.SelectedModel)
+        </div>       
+    </div>
+
+    <input type="submit" value="Submit" class="btn btn-primary" />
+
+}
+

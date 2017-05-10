@@ -46,9 +46,10 @@ namespace Mvc.CascadeDropDown
         /// {1} - ajaxActionParamName
         /// </summary>
         private const string Js2GenerateJsonToSendFromFunctionFormat = @"
-var jsonToSend = {{ {1} : value }};
-var updatedJson = {0}(jsonToSend);
-if(updatedJson){{jsonToSend = updatedJson}}";
+            var jsonToSend = {{ {1} : value }};
+            var updatedJson = {0}(jsonToSend);
+            if(updatedJson){{jsonToSend = updatedJson}}
+            ";
 
         /// <summary>
         /// 2 in order CONDITIONAL
@@ -80,6 +81,7 @@ if(updatedJson){{jsonToSend = updatedJson}}";
         /// 4 in order
         /// {0} -  will have a call to CascadeDropDownOptions.OnCompleteGetData if it was set.
         /// {1} -  will have a call to CascadeDropDownOptions.OnSuccessGetData if it was set.
+        /// {2} -  will have a call to CascadeDropDownOptions.OnFailureGetData if it was set.
         /// </summary>
         private const string Js4OnLoadFormat =
           @"var isSelected = false;
@@ -105,6 +107,7 @@ if(updatedJson){{jsonToSend = updatedJson}}";
                         targetElement.dispatchEvent(event);
                     }}
                 }}
+                {2}
             }};";
 
         /// <summary>
@@ -113,7 +116,7 @@ if(updatedJson){{jsonToSend = updatedJson}}";
         /// {1} -  will have a call to CascadeDropDownOptions.OnFailureGetData if it was set.
         /// </summary>
         private const string Js5ErrorCallback = 
-            @"request.onerror = function (error) {{
+            @"request.onerror = function () {{
                 {0}{1}
             }};";
 
@@ -476,7 +479,8 @@ if(updatedJson){{jsonToSend = updatedJson}}";
         {
             var onComplete = string.Empty;
             var onSuccess = string.Empty;
-            if(options!= null)
+            var onFailure = string.Empty;
+            if (options!= null)
             {
                 if(!string.IsNullOrEmpty(options.OnCompleteGetData))
                 {
@@ -486,8 +490,12 @@ if(updatedJson){{jsonToSend = updatedJson}}";
                 {
                     onSuccess = string.Format("{0}(data);", options.OnSuccessGetData);
                 }
+                if (!string.IsNullOrEmpty(options.OnFailureGetData))
+                {
+                    onFailure = string.Format("if (request.status >= 400){{ {0}(request.responseText, request.status, request.statusText); }}", options.OnFailureGetData);
+                }
             }
-            builder.AppendFormat(Js4OnLoadFormat, onComplete, onSuccess);
+            builder.AppendFormat(Js4OnLoadFormat, onComplete, onSuccess, onFailure);
         }
 
         private static void ApplyErrorCallbackString(ref StringBuilder builder, CascadeDropDownOptions options)
@@ -498,14 +506,14 @@ if(updatedJson){{jsonToSend = updatedJson}}";
             {
                 if (!string.IsNullOrEmpty(options.OnCompleteGetData))
                 {
-                    onComplete = string.Format("{0}(null, error);", options.OnCompleteGetData);
+                    onComplete = string.Format("{0}(null, request.responseText);", options.OnCompleteGetData);
                 }
                 if (!string.IsNullOrEmpty(options.OnSuccessGetData))
                 {
-                    onFailure = string.Format("{0}(error);", options.OnFailureGetData);
+                    onFailure = string.Format("{0}(request.responseText, request.status, request.statusText);", options.OnFailureGetData);
                 }
+                builder.AppendFormat(Js5ErrorCallback, onComplete, onFailure);
             }
-            builder.AppendFormat(Js5ErrorCallback, onComplete, onFailure);
         }
 
         private static void ApplySendRequestString(ref StringBuilder builder, CascadeDropDownOptions options)
