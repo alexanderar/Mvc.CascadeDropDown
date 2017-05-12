@@ -27,4 +27,4 @@
 ### v1.3.2:
   * Added support for disabled options
 
-### v2.0.0 - planned to be release by the end of May 2017
+### v2.0.0 - planned to be released by the end of May 2017
