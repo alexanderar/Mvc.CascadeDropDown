@@ -25,7 +25,7 @@ namespace Mvc.CascadeDropDown
         var triggerElement = document.getElementById('{1}');
         var targetElement = document.getElementById('{0}');
         var preselectedValue = '{2}';
-        triggerElement.addEventListener('change', function(e) {{
+        triggerElement.onchange = function(e) {{
             {3}
             var value = triggerElement.value;
             var items = {4};            
@@ -137,7 +137,7 @@ namespace Mvc.CascadeDropDown
         /// {0} - cascading dropdown element Id
         /// </summary>
         private const string Js7EndFormat = @"
-        }});
+        }};
         if(triggerElement.value && !targetElement.value)
         {{
             var event = document.createEvent('HTMLEvents');
