@@ -54,7 +54,8 @@
                                 htmlAttributes: new { @class = "form-control" },
                                 options: new CascadeDropDownOptions
                                 {
-                                    BeforeSend = "beforeSend"
+                                    BeforeSend = "beforeSend",
+                                    EnableMinification = true
                                 })
             @Html.ValidationMessageFor(m => m.SelectedModel)
         </div>       

@@ -1,31 +1,82 @@
-﻿@{
-    ViewBag.Title = "Home Page";
+﻿
+@using Mvc.CascadeDropDown
+@model Mvc.CascadeDropDown.Test.Models.CascadingDropdownsModel
+
+
+<script>
+    function beforeSend(json)
+    {
+        json.currency = json.country == "US" ? "USD" : "GBP";
+        alert("<p><strong>Going to send:</strong></p><p><small>" + JSON.stringify(json, null, "\t") + "</small></p>", "BeforeSend callback", "success");
+        return json;
+    }
+
+    function onComplete(data, error) {
+        if (data) {
+            msg = "<small>" + JSON.stringify(data, null, "\t") + "</small>";
+            alert(msg, "Successfull onComplete callback", "info");
+        }
+        if (error)
+        {
+            msg = "<p><strong>Got Error:</strong>></p><p>" + error + "</p>";
+            alert(msg, "Error onComplete callback", "info");
+        }
+    }
+
+    function onSuccess(data) {
+        data.push({ Text: "added Item", Value: "" });
+        msg = "<p><strong>Received data was modified</strong></p><p><small>" + JSON.stringify(data, null, "\t") + "</small></p>";
+        alert(msg, "OnSuccess callback", "success");
+    }
+
+    function onFailure(responseText, responseStatus, statusText) {
+        var obj = {
+            responseText: responseText,
+            responseStatus: responseStatus,
+            statusText: statusText
+        }
+        msg = "<p><strong>Got Error:</strong>></p><p><small>" + JSON.stringify(obj, null, "\t") + "</small></p>"
+        alert(msg, "OnFailure callback", "error");
+    }
+
+</script>
+
+@using (Html.BeginForm("CascadingDropDownTest", "Home", FormMethod.Post))
+{
+
+    <div class="form-horizontal">
+        <div class="form-group">
+
+            @Html.DropDownListFor(m => m.SelectedCountry, Model.Countries, "Please select a Country", new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.SelectedCountry)
+        </div>
+        <div class="form-group">
+            @Html.CascadingDropDownListFor(expression: m => m.SelectedCity,
+                                triggeredByProperty: m => m.SelectedCountry,
+                                url: Url.Action("GetCities", "Home"),
+                                ajaxActionParamName: "country",
+                                disabledWhenParentNotSelected: true,
+                                htmlAttributes: new { @class = "form-control" },
+                                options: new CascadeDropDownOptions
+                                {
+                                    BeforeSend = "beforeSend",
+                                    HttpMethod = "post",
+                                    OnCompleteGetData = "onComplete",
+                                    OnFailureGetData = "onFailure",
+                                    OnSuccessGetData = "onSuccess",
+                                    EnableMinification = true
+                                })
+            @Html.ValidationMessageFor(m => m.SelectedCity)
+        </div>
+        <div class="form-group">
+            @Html.CascadingDropDownListFor(m => m.SelectedStreet, m => m.SelectedCity, Url.Action("GetStreets", "Home"), "city", "Please select a Street", true, new { @class = "form-control" }, new CascadeDropDownOptions
+           {
+               OnFailureGetData = "onFailure",
+           })
+            @Html.ValidationMessageFor(m => m.SelectedStreet)
+        </div>
+    </div>
+
+    <input type="submit" value="Submit" class="btn btn-primary" />
+
 }
-
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="http://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
-</div>
-
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-    </div>
-</div>

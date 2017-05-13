@@ -6,11 +6,6 @@ namespace Mvc.CascadeDropDown.Test.Controllers
 {
     public class HomeController : Controller
     {
-        public ActionResult Index()
-        {
-            return View("PureJavaScriptTest");
-        }
-
         public ActionResult MultipleDependencies()
         {
             var model = new MultipleDependenciesModel
@@ -59,7 +54,7 @@ namespace Mvc.CascadeDropDown.Test.Controllers
             return  Json(result, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult CascadingDropDownTest()
+        public ActionResult Index()
         {
             var model = new CascadingDropdownsModel
             {
