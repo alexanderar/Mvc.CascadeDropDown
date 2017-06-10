@@ -32,10 +32,5 @@
         /// GET or POST (GET is default)
         /// </summary>
         public string HttpMethod { get; set; }
-
-        /// <summary>
-        /// Gets or sets the value that indicates whether generated JS should be minified
-        /// </summary>
-        public bool EnableMinification { get; set; }
     }
 }

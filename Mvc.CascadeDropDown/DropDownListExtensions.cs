@@ -28,17 +28,16 @@ namespace Mvc.CascadeDropDown
         triggerElement.onchange = function(e) {{
             {3}
             var value = triggerElement.value;
-            var items = {4};            
+            var items = {4};
             if (!value) {{
                 targetElement.innerHTML = items;
-                targetElement.value = '';                
+                targetElement.value = '';
                 var event = document.createEvent('HTMLEvents');
                 event.initEvent('change', true, false);
                 targetElement.dispatchEvent(event);
                 {5}
                 return;
             }}";
-        //var items = '<option value="""">{4}</option>'; 
 
         /// <summary>
         /// 2 in order CONDITIONAL
@@ -85,9 +84,9 @@ namespace Mvc.CascadeDropDown
         /// </summary>
         private const string Js4OnLoadFormat =
           @"var isSelected = false;
-            request.onload = function () {{                
+            request.onload = function () {{
                 if (request.status >= 200 && request.status < 400) {{
-                    var data = JSON.parse(request.responseText);                    
+                    var data = JSON.parse(request.responseText);
                     {0}
                     {1}
                     if (data) {{
@@ -107,7 +106,15 @@ namespace Mvc.CascadeDropDown
                         targetElement.dispatchEvent(event);
                     }}
                 }}
-                {2}
+                if (request.status >= 400){{
+                    var placeholder = targetElement.dataset.optionLbl;
+                    targetElement.innerHTML = null;
+                    if(placeholder)
+                    {{
+                        targetElement.innerHTML = '<option value="""">' + placeholder + '</option>';
+                    }}
+                    {2}
+                }}
             }};";
 
         /// <summary>
@@ -175,10 +182,10 @@ namespace Mvc.CascadeDropDown
         triggerElement.addEventListener('change', function(e) {{
             {7}
             var value = triggerElement.value;
-            var items = '<option value="""">{3}</option>';            
+            var items = '<option value="""">{3}</option>';
             if (!value) {{
                 targetElement.innerHTML = items;
-                targetElement.value = '';                
+                targetElement.value = '';
                 var event = document.createEvent('HTMLEvents');
                 event.initEvent('change', true, false);
                 targetElement.dispatchEvent(event);
@@ -194,19 +201,19 @@ namespace Mvc.CascadeDropDown
                 if (request.status >= 200 && request.status < 400) {{
                     // Success!
                     var data = JSON.parse(request.responseText);
-                    if (data) {{                        
-                        data.forEach(function(item, i) {{                              
-                            items += '<option value=""' + item.Value + '"">' + item.Text + '</option>';                                
+                    if (data) {{
+                        data.forEach(function(item, i) {{
+                            items += '<option value=""' + item.Value + '"">' + item.Text + '</option>';
                         }});
                         targetElement.innerHTML = items;  
                         if(preselectedValue)
-                        {{                           
-                            targetElement.value = preselectedValue;                            
-                            preselectedValue = null;                           
+                        {{
+                            targetElement.value = preselectedValue;
+                            preselectedValue = null;
                         }}  
                         var event = document.createEvent('HTMLEvents');
                         event.initEvent('change', true, false);
-                        targetElement.dispatchEvent(event);                                                                                          
+                        targetElement.dispatchEvent(event);
                     }}
                 }} else {{
                     console.log(request.statusText);
@@ -409,7 +416,7 @@ namespace Mvc.CascadeDropDown
             string ajaxActionParamName,
             string selectedValue,
             string optionLabel = null,
-            bool disabledWhenParentNotSelected = false,          
+            bool disabledWhenParentNotSelected = false,
             RouteValueDictionary htmlAttributes = null,
             CascadeDropDownOptions options = null)
         {
@@ -421,6 +428,11 @@ namespace Mvc.CascadeDropDown
             htmlAttributes.Add("data-cascade-dd-url", url);
             var setDisableString = string.Empty;
             var removeDisabledString = string.Empty;
+
+            if(optionLabel != null)
+            {
+                htmlAttributes.Add("data-option-lbl", optionLabel);
+            }
 
             if (disabledWhenParentNotSelected)
             {               
@@ -445,20 +457,7 @@ namespace Mvc.CascadeDropDown
             ApplyErrorCallbackString(ref scriptBuilder, options);
             ApplySendRequestString(ref scriptBuilder, options);
             scriptBuilder.AppendFormat(Js7EndFormat, cascadeDdElementId);
-            string script;
-            if(options != null && options.EnableMinification)
-            {
-                var minifier = new WebMarkupMin.NUglify.NUglifyJsMinifier(new WebMarkupMin.NUglify.NUglifyJsMinificationSettings {
-                    LocalRenaming = WebMarkupMin.NUglify.LocalRenaming.CrunchAll,
-                    OutputMode = WebMarkupMin.NUglify.OutputMode.SingleLine
-                });
-                var minificationResult = minifier.Minify(scriptBuilder.ToString(), true);
-                script = string.Concat("<script>", minificationResult.MinifiedContent, "</script>");
-            }
-            else
-            {
-                script = string.Concat("<script>", scriptBuilder.ToString(), "</script>");
-            }
+            var script = string.Concat("<script>", scriptBuilder.ToString(), "</script>");
             return new MvcHtmlString(string.Concat(defaultDropDownHtml.ToString(),Environment.NewLine, script));
         }
 
@@ -492,7 +491,7 @@ namespace Mvc.CascadeDropDown
                 }
                 if (!string.IsNullOrEmpty(options.OnFailureGetData))
                 {
-                    onFailure = string.Format("if (request.status >= 400){{ {0}(request.responseText, request.status, request.statusText); }}", options.OnFailureGetData);
+                    onFailure = string.Format("{0}(request.responseText, request.status, request.statusText);", options.OnFailureGetData);
                 }
             }
             builder.AppendFormat(Js4OnLoadFormat, onComplete, onSuccess, onFailure);
