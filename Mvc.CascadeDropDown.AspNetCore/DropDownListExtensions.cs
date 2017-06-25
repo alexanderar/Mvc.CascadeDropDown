@@ -7,15 +7,17 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Mvc.CascadeDropDown
+namespace Mvc.CascadeDropDown.AspNetCore
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
+    using System.IO;
     using System.Linq.Expressions;
-    using System.Web.Mvc;
-    using System.Web.Mvc.Html;
-    using System.Web.Routing;
+
+    using Microsoft.AspNetCore.Html;
+    using Microsoft.AspNetCore.Mvc.Rendering;
+    using Microsoft.AspNetCore.Mvc.ViewFeatures;
+    using Microsoft.AspNetCore.Routing;
 
     using Mvc.CascadeDropDown.Infrastructure;
 
@@ -62,12 +64,12 @@ namespace Mvc.CascadeDropDown
         /// <typeparam name="TProperty">
         /// </typeparam>
         /// <returns>
-        /// The <see cref="MvcHtmlString"/>.
+        /// The <see cref="IHtmlContent"/>.
         /// </returns>
         /// <exception cref="ArgumentException">
         /// </exception>
-        public static MvcHtmlString CascadingDropDownList<TModel, TProperty>(
-            this HtmlHelper htmlHelper,
+        public static IHtmlContent CascadingDropDownList<TModel, TProperty>(
+            this IHtmlHelper<TModel> htmlHelper,
             string inputName,
             string inputId,
             Expression<Func<TModel, TProperty>> triggeredByProperty,
@@ -133,8 +135,8 @@ namespace Mvc.CascadeDropDown
         /// <returns>
         /// The <see cref="MvcHtmlString"/>.
         /// </returns>
-        public static MvcHtmlString CascadingDropDownList(
-            this HtmlHelper htmlHelper,
+        public static IHtmlContent CascadingDropDownList(
+            this IHtmlHelper htmlHelper,
             string inputName,
             string inputId,
             string triggeredByProperty,
@@ -195,8 +197,8 @@ namespace Mvc.CascadeDropDown
         /// <returns>
         /// The <see cref="MvcHtmlString"/>.
         /// </returns>
-        public static MvcHtmlString CascadingDropDownList(
-            this HtmlHelper htmlHelper,
+        public static IHtmlContent CascadingDropDownList(
+            this IHtmlHelper htmlHelper,
             string inputName,
             string inputId,
             string triggeredByProperty,
@@ -252,21 +254,18 @@ namespace Mvc.CascadeDropDown
         /// The options.
         /// </param>
         /// <typeparam name="TModel">
-        /// Type of model
         /// </typeparam>
         /// <typeparam name="TProperty">
-        /// Type of property in the model
         /// </typeparam>
         /// <typeparam name="TProperty2">
-        /// Type of property in the model
         /// </typeparam>
         /// <returns>
         /// The <see cref="MvcHtmlString"/>.
         /// </returns>
         /// <exception cref="ArgumentException">
         /// </exception>
-        public static MvcHtmlString CascadingDropDownListFor<TModel, TProperty, TProperty2>(
-            this HtmlHelper<TModel> htmlHelper,
+        public static IHtmlContent CascadingDropDownListFor<TModel, TProperty, TProperty2>(
+            this IHtmlHelper<TModel> htmlHelper,
             Expression<Func<TModel, TProperty>> expression,
             Expression<Func<TModel, TProperty2>> triggeredByProperty,
             string url,
@@ -337,19 +336,16 @@ namespace Mvc.CascadeDropDown
         /// The options.
         /// </param>
         /// <typeparam name="TModel">
-        /// Type of model
         /// </typeparam>
         /// <typeparam name="TProperty">
-        /// Type of property in the model
         /// </typeparam>
         /// <returns>
-        /// The <see cref="MvcHtmlString"/>.
+        /// The <see cref="IHtmlContent{T}"/>.
         /// </returns>
         /// <exception cref="ArgumentException">
-        /// Thrown if case that expression is invalid and could not be resolved
         /// </exception>
-        public static MvcHtmlString CascadingDropDownListFor<TModel, TProperty>(
-            this HtmlHelper<TModel> htmlHelper,
+        public static IHtmlContent CascadingDropDownListFor<TModel, TProperty>(
+            this IHtmlHelper<TModel> htmlHelper,
             Expression<Func<TModel, TProperty>> expression,
             string triggeredByPropertyWithId,
             string url,
@@ -422,8 +418,8 @@ namespace Mvc.CascadeDropDown
         /// <returns>
         /// The <see cref="MvcHtmlString"/>.
         /// </returns>
-        private static MvcHtmlString CascadingDropDownList(
-            this HtmlHelper htmlHelper,
+        private static IHtmlContent CascadingDropDownList(
+            this IHtmlHelper htmlHelper,
             string inputName,
             string cascadeDdElementId,
             string triggeredByProperty,
@@ -432,25 +428,32 @@ namespace Mvc.CascadeDropDown
             string selectedValue,
             string optionLabel = null,
             bool disabledWhenParentNotSelected = false,
-            RouteValueDictionary htmlAttributes = null,
+            IDictionary<string, object> htmlAttributes = null,
             CascadeDropDownOptions options = null)
         {
+            Func<string, IDictionary<string, object>, string, string> defaultDropDownFactory = (inptName, htmlAttrsDictionnary, optLbl) =>
+                {
+                    using (var writer = new StringWriter())
+                    {
+                        htmlHelper.DropDownList(inptName, new List<SelectListItem>(), optLbl, htmlAttrsDictionnary)
+                        .WriteTo(writer, System.Text.Encodings.Web.HtmlEncoder.Default);
+                        return writer.ToString();
+                    }
+                };
 
-            Func<string, IDictionary<string, object>, string, string> defaultDropDownFactory = (input, attributesDictionary, optLbl)
-                => htmlHelper.DropDownList(input, new List<SelectListItem>(), optLbl, attributesDictionary).ToString();
-
-            return new MvcHtmlString(CascadeDropDownCreator.Create(
-                defaultDropDownFactory,
-                inputName,
-                cascadeDdElementId,
-                triggeredByProperty,
-                url,
-                ajaxActionParamName,
-                selectedValue,
-                optionLabel,
-                disabledWhenParentNotSelected,
-                htmlAttributes,
-                options));
+            return new HtmlString(
+                CascadeDropDownCreator.Create(
+                    defaultDropDownFactory,
+                    inputName,
+                    cascadeDdElementId,
+                    triggeredByProperty,
+                    url,
+                    ajaxActionParamName,
+                    selectedValue,
+                    optionLabel,
+                    disabledWhenParentNotSelected,
+                    htmlAttributes,
+                    options));
         }
     }
 }

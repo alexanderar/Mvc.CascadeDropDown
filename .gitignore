@@ -9,3 +9,9 @@
 /Mvc.CascadeDropDown.Test/obj
 /.vs/Mvc.CascadeDropDown/v14/.suo
 /.vs/config/applicationhost.config
+/Mvc.CascadeDropDown.AspNetCore/obj
+/Mvc.CascadeDropDown.AspNetCore/bin
+/Mvc.CascadeDropDown.AspNetCore.Test/obj
+/Mvc.CascadeDropDown.AspNetCore.Test/bin
+/Mvc.CascadeDropDown.Infrastructure/obj
+/Mvc.CascadeDropDown.Infrastructure/bin

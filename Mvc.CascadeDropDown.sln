@@ -1,11 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mvc.CascadeDropDown", "Mvc.CascadeDropDown\Mvc.CascadeDropDown.csproj", "{9AFCA1AB-7B5C-49C0-A067-EE5393069686}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mvc.CascadeDropDown.Test", "Mvc.CascadeDropDown.Test\Mvc.CascadeDropDown.Test.csproj", "{A192DD44-67DB-4304-AD5F-373BD9589A4B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mvc.CascadeDropDown.AspNetCore", "Mvc.CascadeDropDown.AspNetCore\Mvc.CascadeDropDown.AspNetCore.csproj", "{C6665339-7D13-432E-BF0C-3B9934272101}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mvc.CascadeDropDown.Infrastructure", "Mvc.CascadeDropDown.Infrastructure\Mvc.CascadeDropDown.Infrastructure.csproj", "{3FC3A779-0642-4F81-924D-BC01FAB0DA5C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mvc.CascadeDropDown.AspNetCore.Test", "Mvc.CascadeDropDown.AspNetCore.Test\Mvc.CascadeDropDown.AspNetCore.Test.csproj", "{64272D85-0E7F-4685-A9A3-853687164802}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +27,18 @@ Global
 		{A192DD44-67DB-4304-AD5F-373BD9589A4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A192DD44-67DB-4304-AD5F-373BD9589A4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A192DD44-67DB-4304-AD5F-373BD9589A4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6665339-7D13-432E-BF0C-3B9934272101}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6665339-7D13-432E-BF0C-3B9934272101}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6665339-7D13-432E-BF0C-3B9934272101}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6665339-7D13-432E-BF0C-3B9934272101}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FC3A779-0642-4F81-924D-BC01FAB0DA5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FC3A779-0642-4F81-924D-BC01FAB0DA5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FC3A779-0642-4F81-924D-BC01FAB0DA5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FC3A779-0642-4F81-924D-BC01FAB0DA5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64272D85-0E7F-4685-A9A3-853687164802}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64272D85-0E7F-4685-A9A3-853687164802}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64272D85-0E7F-4685-A9A3-853687164802}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64272D85-0E7F-4685-A9A3-853687164802}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
