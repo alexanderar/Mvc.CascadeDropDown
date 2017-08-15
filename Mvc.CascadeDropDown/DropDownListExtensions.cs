@@ -243,7 +243,7 @@ namespace Mvc.CascadeDropDown
 </script>";
        
         public static MvcHtmlString CascadingDropDownList<TModel, TProperty>(
-            this HtmlHelper htmlHelper,
+            this HtmlHelper<TModel> htmlHelper,
             string inputName,
             string inputId,
             Expression<Func<TModel, TProperty>> triggeredByProperty,
@@ -254,8 +254,8 @@ namespace Mvc.CascadeDropDown
             object htmlAttributes = null,
             CascadeDropDownOptions options = null)
         {
-            MemberInfo triggerMemberInfo = GetMemberInfo(triggeredByProperty);
-            if (triggerMemberInfo == null)
+            var triggeredByPropId = htmlHelper.GetElementIdFromExpression(triggeredByProperty);
+            if (string.IsNullOrEmpty(triggeredByPropId))
             {
                 throw new ArgumentException("triggeredByProperty argument is invalid");
             }
@@ -264,7 +264,7 @@ namespace Mvc.CascadeDropDown
                 htmlHelper,
                 inputName,
                 inputId,
-                triggerMemberInfo.Name,
+                triggeredByPropId,
                 url,
                 ajaxActionParamName,
                 optionLabel,
@@ -313,26 +313,24 @@ namespace Mvc.CascadeDropDown
             object htmlAttributes = null,
             CascadeDropDownOptions options = null)
         {
-            var triggerMemberInfo = GetMemberInfo(triggeredByProperty);
-            var dropDownElement = GetMemberInfo(expression);
-
-            if (dropDownElement == null)
+            var dropDownElementName = htmlHelper.GetElementNameFromExpression(expression);
+            var dropDownElementId = GetDropDownElementId(htmlAttributes) ?? htmlHelper.GetElementIdFromExpression(expression);
+            if (string.IsNullOrEmpty(dropDownElementName) || string.IsNullOrEmpty(dropDownElementId))
             {
                 throw new ArgumentException("expression argument is invalid");
             }
 
-            if (dropDownElement == null)
+            var triggeredByPropId = htmlHelper.GetElementIdFromExpression(triggeredByProperty);
+            if (string.IsNullOrEmpty(triggeredByPropId))
             {
                 throw new ArgumentException("triggeredByProperty argument is invalid");
             }
 
-            var dropDownElementName = dropDownElement.Name;
-            var dropDownElementId = GetDropDownElementId(htmlAttributes) ?? dropDownElement.Name;
-
-            return CascadingDropDownList(htmlHelper,
+            return CascadingDropDownList(
+                htmlHelper,
                 dropDownElementName,
                 dropDownElementId,
-                triggerMemberInfo.Name,
+                triggeredByPropId,
                 url,
                 ajaxActionParamName,
                 GetPropStringValue(htmlHelper.ViewData.Model, expression),
@@ -355,15 +353,12 @@ namespace Mvc.CascadeDropDown
             object htmlAttributes = null,
             CascadeDropDownOptions options = null)
         {
-            var dropDownElement = GetMemberInfo(expression);
-
-            if (dropDownElement == null)
+            var dropDownElementName = htmlHelper.GetElementNameFromExpression(expression);
+            var dropDownElementId = GetDropDownElementId(htmlAttributes) ?? htmlHelper.GetElementIdFromExpression(expression);
+            if (string.IsNullOrEmpty(dropDownElementName) || string.IsNullOrEmpty(dropDownElementId))
             {
                 throw new ArgumentException("expression argument is invalid");
             }
-
-            var dropDownElementName = dropDownElement.Name;
-            var dropDownElementId = GetDropDownElementId(htmlAttributes) ?? dropDownElement.Name;
 
             return CascadingDropDownList(
                 htmlHelper,
@@ -379,7 +374,17 @@ namespace Mvc.CascadeDropDown
                 ? HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes)
                 : new RouteValueDictionary(),
                 options);
-        }       
+        }
+
+        private static string GetElementIdFromExpression<TModel, TProperty>(this HtmlHelper<TModel> htmlHelper, Expression<Func<TModel, TProperty>> expression)
+        {
+            return htmlHelper.ViewData.TemplateInfo.GetFullHtmlFieldId(ExpressionHelper.GetExpressionText(expression));
+        }
+
+        private static string GetElementNameFromExpression<TModel, TProperty>(this HtmlHelper<TModel> htmlHelper, Expression<Func<TModel, TProperty>> expression)
+        {
+            return htmlHelper.ViewData.TemplateInfo.GetFullHtmlFieldName(ExpressionHelper.GetExpressionText(expression));
+        }
 
         public static MvcHtmlString CascadingDropDownList(
             this HtmlHelper htmlHelper,
@@ -440,7 +445,6 @@ namespace Mvc.CascadeDropDown
                 setDisableString = "targetElement.setAttribute('disabled','disabled');";
                 removeDisabledString = "targetElement.removeAttribute('disabled');";
             }
-
            
             var defaultDropDownHtml = htmlHelper.DropDownList(
                 inputName,
@@ -519,25 +523,6 @@ namespace Mvc.CascadeDropDown
         {
             builder.Append(options == null || options.HttpMethod == null || !options.HttpMethod.Equals("POST", StringComparison.OrdinalIgnoreCase) ?
                 Js6SendGetRequest : Js6SendPostRequest);
-        }
-
-        /// <summary>
-        ///     The get member info.
-        /// </summary>
-        /// <param inputName="propSelector">
-        ///     The prop selector.
-        /// </param>
-        /// <typeparam inputName="TModel">
-        /// </typeparam>
-        /// <typeparam inputName="TProp">
-        /// </typeparam>
-        /// <returns>
-        ///     The <see cref="MemberInfo" />.
-        /// </returns>
-        private static MemberInfo GetMemberInfo<TModel, TProp>(Expression<Func<TModel, TProp>> propSelector)
-        {
-            var body = propSelector.Body as MemberExpression;
-            return body != null ? body.Member : null;
         }
 
         private static string GetPropStringValue(object src, string propName)
