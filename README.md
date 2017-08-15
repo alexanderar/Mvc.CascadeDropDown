@@ -32,3 +32,6 @@
 * **Breaking change** Fixed typo in `disabledWhenParrentNotSelected` argument name - fixed name is 
  `disabledWhenParentNotSelected`
 * Introduced CascadeDropDownOptions that define the behavior of the helper and allow to set callbacks for an events which happen in casccading dropdown flow such as BeforeSend, OnCompleteGetData, OnFailureGetData, OnSuccessGetData.
+
+### v2.0.1
+* Fix for dropdown id resolving when using nested models (https://github.com/alexanderar/Mvc.CascadeDropDown/issues/26)
