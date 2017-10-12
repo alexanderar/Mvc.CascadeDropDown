@@ -13,10 +13,12 @@ namespace Mvc.CascadeDropDown.AspNetCore
     using System.Collections.Generic;
     using System.IO;
     using System.Linq.Expressions;
+    using System.Text.Encodings.Web;
 
     using Microsoft.AspNetCore.Html;
     using Microsoft.AspNetCore.Mvc.Rendering;
     using Microsoft.AspNetCore.Mvc.ViewFeatures;
+    using Microsoft.AspNetCore.Mvc.ViewFeatures.Internal;
     using Microsoft.AspNetCore.Routing;
 
     using Mvc.CascadeDropDown.Infrastructure;
@@ -80,8 +82,8 @@ namespace Mvc.CascadeDropDown.AspNetCore
             object htmlAttributes = null,
             CascadeDropDownOptions options = null)
         {
-            var triggerMemberInfo = Utils.GetMemberInfo(triggeredByProperty);
-            if (triggerMemberInfo == null)
+            var triggeredByPropId = htmlHelper.GetElementIdFromExpression(triggeredByProperty);
+            if (string.IsNullOrEmpty(triggeredByPropId))
             {
                 throw new ArgumentException("triggeredByProperty argument is invalid");
             }
@@ -90,7 +92,7 @@ namespace Mvc.CascadeDropDown.AspNetCore
                 htmlHelper,
                 inputName,
                 inputId,
-                triggerMemberInfo.Name,
+                triggeredByPropId,
                 url,
                 ajaxActionParamName,
                 optionLabel,
@@ -275,27 +277,25 @@ namespace Mvc.CascadeDropDown.AspNetCore
             object htmlAttributes = null,
             CascadeDropDownOptions options = null)
         {
-            var triggerMemberInfo = Utils.GetMemberInfo(triggeredByProperty);
-            var dropDownElement = Utils.GetMemberInfo(expression);
+            var dropDownElementName = htmlHelper.GetElementNameFromExpression(expression);
+            var dropDownElementId = Utils.GetDropDownElementId(htmlAttributes) ?? htmlHelper.GetElementIdFromExpression(expression);
 
-            if (dropDownElement == null)
+            if (string.IsNullOrEmpty(dropDownElementName) || string.IsNullOrEmpty(dropDownElementId))
             {
                 throw new ArgumentException("expression argument is invalid");
             }
 
-            if (dropDownElement == null)
+            var triggeredByPropId = htmlHelper.GetElementIdFromExpression(triggeredByProperty);
+            if (string.IsNullOrEmpty(triggeredByPropId))
             {
                 throw new ArgumentException("triggeredByProperty argument is invalid");
             }
-
-            var dropDownElementName = dropDownElement.Name;
-            var dropDownElementId = Utils.GetDropDownElementId(htmlAttributes) ?? dropDownElement.Name;
 
             return CascadingDropDownList(
                 htmlHelper,
                 dropDownElementName,
                 dropDownElementId,
-                triggerMemberInfo.Name,
+                triggeredByPropId,
                 url,
                 ajaxActionParamName,
                 Utils.GetPropStringValue(htmlHelper.ViewData.Model, expression),
@@ -355,15 +355,13 @@ namespace Mvc.CascadeDropDown.AspNetCore
             object htmlAttributes = null,
             CascadeDropDownOptions options = null)
         {
-            var dropDownElement = Utils.GetMemberInfo(expression);
+            var dropDownElementName = htmlHelper.GetElementNameFromExpression(expression);
+            var dropDownElementId = Utils.GetDropDownElementId(htmlAttributes) ?? htmlHelper.GetElementIdFromExpression(expression);
 
-            if (dropDownElement == null)
+            if (string.IsNullOrEmpty(dropDownElementName) || string.IsNullOrEmpty(dropDownElementId))
             {
                 throw new ArgumentException("expression argument is invalid");
             }
-
-            var dropDownElementName = dropDownElement.Name;
-            var dropDownElementId = Utils.GetDropDownElementId(htmlAttributes) ?? dropDownElement.Name;
 
             return CascadingDropDownList(
                 htmlHelper,
@@ -435,8 +433,7 @@ namespace Mvc.CascadeDropDown.AspNetCore
                 {
                     using (var writer = new StringWriter())
                     {
-                        htmlHelper.DropDownList(inptName, new List<SelectListItem>(), optLbl, htmlAttrsDictionnary)
-                        .WriteTo(writer, System.Text.Encodings.Web.HtmlEncoder.Default);
+                        htmlHelper.DropDownList(inptName, new List<SelectListItem>(), optLbl, htmlAttrsDictionnary).WriteTo(writer, HtmlEncoder.Default);
                         return writer.ToString();
                     }
                 };
@@ -454,6 +451,53 @@ namespace Mvc.CascadeDropDown.AspNetCore
                     disabledWhenParentNotSelected,
                     htmlAttributes,
                     options));
+        }
+
+        /// <summary>
+        /// The get element id from expression.
+        /// </summary>
+        /// <param name="htmlHelper">
+        /// The html helper.
+        /// </param>
+        /// <param name="expression">
+        /// The expression.
+        /// </param>
+        /// <typeparam name="TModel">
+        /// The type of model
+        /// </typeparam>
+        /// <typeparam name="TProperty">
+        /// The type of property
+        /// </typeparam>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
+        private static string GetElementIdFromExpression<TModel, TProperty>(this IHtmlHelper<TModel> htmlHelper, Expression<Func<TModel, TProperty>> expression)
+        {
+            var fullName = htmlHelper.GetElementNameFromExpression(expression);
+            return htmlHelper.GenerateIdFromName(fullName);
+        }
+
+        /// <summary>
+        /// The get element name from expression.
+        /// </summary>
+        /// <param name="htmlHelper">
+        /// The html helper.
+        /// </param>
+        /// <param name="expression">
+        /// The expression.
+        /// </param>
+        /// <typeparam name="TModel">
+        /// The type of model
+        /// </typeparam>
+        /// <typeparam name="TProperty">
+        /// The type of property
+        /// </typeparam>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
+        private static string GetElementNameFromExpression<TModel, TProperty>(this IHtmlHelper<TModel> htmlHelper, Expression<Func<TModel, TProperty>> expression)
+        {
+            return htmlHelper.ViewData.TemplateInfo.GetFullHtmlFieldName(ExpressionHelper.GetExpressionText(expression));
         }
     }
 }

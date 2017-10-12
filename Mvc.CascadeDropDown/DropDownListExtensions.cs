@@ -11,7 +11,6 @@ namespace Mvc.CascadeDropDown
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq.Expressions;
     using System.Web.Mvc;
     using System.Web.Mvc.Html;
@@ -43,7 +42,7 @@ namespace Mvc.CascadeDropDown
         /// The url.
         /// </param>
         /// <param name="ajaxActionParamName">
-        /// The ajax action param name.
+        /// The ajax action parameter name.
         /// </param>
         /// <param name="optionLabel">
         /// The option label.
@@ -58,16 +57,16 @@ namespace Mvc.CascadeDropDown
         /// The options.
         /// </param>
         /// <typeparam name="TModel">
+        /// The type of model
         /// </typeparam>
         /// <typeparam name="TProperty">
+        /// The type of property
         /// </typeparam>
         /// <returns>
         /// The <see cref="MvcHtmlString"/>.
         /// </returns>
-        /// <exception cref="ArgumentException">
-        /// </exception>
         public static MvcHtmlString CascadingDropDownList<TModel, TProperty>(
-            this HtmlHelper htmlHelper,
+            this HtmlHelper<TModel> htmlHelper,
             string inputName,
             string inputId,
             Expression<Func<TModel, TProperty>> triggeredByProperty,
@@ -78,17 +77,13 @@ namespace Mvc.CascadeDropDown
             object htmlAttributes = null,
             CascadeDropDownOptions options = null)
         {
-            var triggerMemberInfo = Utils.GetMemberInfo(triggeredByProperty);
-            if (triggerMemberInfo == null)
-            {
-                throw new ArgumentException("triggeredByProperty argument is invalid");
-            }
+            var triggeredByPropId = htmlHelper.GetElementIdFromExpression(triggeredByProperty);
 
             return CascadingDropDownList(
                 htmlHelper,
                 inputName,
                 inputId,
-                triggerMemberInfo.Name,
+                triggeredByPropId,
                 url,
                 ajaxActionParamName,
                 optionLabel,
@@ -116,7 +111,7 @@ namespace Mvc.CascadeDropDown
         /// The url.
         /// </param>
         /// <param name="ajaxActionParamName">
-        /// The ajax action param name.
+        /// The ajax action parameter name.
         /// </param>
         /// <param name="optionLabel">
         /// The option label.
@@ -178,7 +173,7 @@ namespace Mvc.CascadeDropDown
         /// The url.
         /// </param>
         /// <param name="ajaxActionParamName">
-        /// The ajax action param name.
+        /// The ajax action parameter name.
         /// </param>
         /// <param name="optionLabel">
         /// The option label.
@@ -237,7 +232,7 @@ namespace Mvc.CascadeDropDown
         /// The url.
         /// </param>
         /// <param name="ajaxActionParamName">
-        /// The ajax action param name.
+        /// The ajax action parameter name.
         /// </param>
         /// <param name="optionLabel">
         /// The option label.
@@ -258,13 +253,11 @@ namespace Mvc.CascadeDropDown
         /// Type of property in the model
         /// </typeparam>
         /// <typeparam name="TProperty2">
-        /// Type of property in the model
+        /// Type of property which serves as a trigger
         /// </typeparam>
         /// <returns>
         /// The <see cref="MvcHtmlString"/>.
         /// </returns>
-        /// <exception cref="ArgumentException">
-        /// </exception>
         public static MvcHtmlString CascadingDropDownListFor<TModel, TProperty, TProperty2>(
             this HtmlHelper<TModel> htmlHelper,
             Expression<Func<TModel, TProperty>> expression,
@@ -276,27 +269,25 @@ namespace Mvc.CascadeDropDown
             object htmlAttributes = null,
             CascadeDropDownOptions options = null)
         {
-            var triggerMemberInfo = Utils.GetMemberInfo(triggeredByProperty);
-            var dropDownElement = Utils.GetMemberInfo(expression);
+            var dropDownElementName = htmlHelper.GetElementNameFromExpression(expression);
+            var dropDownElementId = Utils.GetDropDownElementId(htmlAttributes) ?? htmlHelper.GetElementIdFromExpression(expression);
 
-            if (dropDownElement == null)
+            if (string.IsNullOrEmpty(dropDownElementName) || string.IsNullOrEmpty(dropDownElementId))
             {
                 throw new ArgumentException("expression argument is invalid");
             }
 
-            if (dropDownElement == null)
+            var triggeredByPropId = htmlHelper.GetElementIdFromExpression(triggeredByProperty);
+            if (string.IsNullOrEmpty(triggeredByPropId))
             {
                 throw new ArgumentException("triggeredByProperty argument is invalid");
             }
-
-            var dropDownElementName = dropDownElement.Name;
-            var dropDownElementId = Utils.GetDropDownElementId(htmlAttributes) ?? dropDownElement.Name;
 
             return CascadingDropDownList(
                 htmlHelper,
                 dropDownElementName,
                 dropDownElementId,
-                triggerMemberInfo.Name,
+                triggeredByPropId,
                 url,
                 ajaxActionParamName,
                 Utils.GetPropStringValue(htmlHelper.ViewData.Model, expression),
@@ -322,7 +313,7 @@ namespace Mvc.CascadeDropDown
         /// The url.
         /// </param>
         /// <param name="ajaxActionParamName">
-        /// The ajax action param name.
+        /// The ajax action parameter name.
         /// </param>
         /// <param name="optionLabel">
         /// The option label.
@@ -359,15 +350,13 @@ namespace Mvc.CascadeDropDown
             object htmlAttributes = null,
             CascadeDropDownOptions options = null)
         {
-            var dropDownElement = Utils.GetMemberInfo(expression);
+            var dropDownElementName = htmlHelper.GetElementNameFromExpression(expression);
+            var dropDownElementId = Utils.GetDropDownElementId(htmlAttributes) ?? htmlHelper.GetElementIdFromExpression(expression);
 
-            if (dropDownElement == null)
+            if (string.IsNullOrEmpty(dropDownElementName) || string.IsNullOrEmpty(dropDownElementId))
             {
                 throw new ArgumentException("expression argument is invalid");
             }
-
-            var dropDownElementName = dropDownElement.Name;
-            var dropDownElementId = Utils.GetDropDownElementId(htmlAttributes) ?? dropDownElement.Name;
 
             return CascadingDropDownList(
                 htmlHelper,
@@ -393,7 +382,7 @@ namespace Mvc.CascadeDropDown
         /// The input name.
         /// </param>
         /// <param name="cascadeDdElementId">
-        /// The cascade dd element id.
+        /// The cascade drop down element id.
         /// </param>
         /// <param name="triggeredByProperty">
         /// The triggered by property.
@@ -402,7 +391,7 @@ namespace Mvc.CascadeDropDown
         /// The url.
         /// </param>
         /// <param name="ajaxActionParamName">
-        /// The ajax action param name.
+        /// The ajax action parameter name.
         /// </param>
         /// <param name="selectedValue">
         /// The selected value.
@@ -435,7 +424,6 @@ namespace Mvc.CascadeDropDown
             RouteValueDictionary htmlAttributes = null,
             CascadeDropDownOptions options = null)
         {
-
             Func<string, IDictionary<string, object>, string, string> defaultDropDownFactory = (input, attributesDictionary, optLbl)
                 => htmlHelper.DropDownList(input, new List<SelectListItem>(), optLbl, attributesDictionary).ToString();
 
@@ -451,6 +439,52 @@ namespace Mvc.CascadeDropDown
                 disabledWhenParentNotSelected,
                 htmlAttributes,
                 options));
+        }
+
+        /// <summary>
+        /// The get element id from expression.
+        /// </summary>
+        /// <param name="htmlHelper">
+        /// The html helper.
+        /// </param>
+        /// <param name="expression">
+        /// The expression.
+        /// </param>
+        /// <typeparam name="TModel">
+        /// The type of model
+        /// </typeparam>
+        /// <typeparam name="TProperty">
+        /// The type of property
+        /// </typeparam>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
+        private static string GetElementIdFromExpression<TModel, TProperty>(this HtmlHelper<TModel> htmlHelper, Expression<Func<TModel, TProperty>> expression)
+        {
+            return htmlHelper.ViewData.TemplateInfo.GetFullHtmlFieldId(ExpressionHelper.GetExpressionText(expression));
+        }
+
+        /// <summary>
+        /// The get element name from expression.
+        /// </summary>
+        /// <param name="htmlHelper">
+        /// The html helper.
+        /// </param>
+        /// <param name="expression">
+        /// The expression.
+        /// </param>
+        /// <typeparam name="TModel">
+        /// The type of model
+        /// </typeparam>
+        /// <typeparam name="TProperty">
+        /// The type of property
+        /// </typeparam>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
+        private static string GetElementNameFromExpression<TModel, TProperty>(this HtmlHelper<TModel> htmlHelper, Expression<Func<TModel, TProperty>> expression)
+        {
+            return htmlHelper.ViewData.TemplateInfo.GetFullHtmlFieldName(ExpressionHelper.GetExpressionText(expression));
         }
     }
 }

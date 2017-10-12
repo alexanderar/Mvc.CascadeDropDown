@@ -156,13 +156,13 @@ namespace Mvc.CascadeDropDown.Infrastructure
             event.initEvent('change', true, false);
             triggerElement.dispatchEvent(event);           
         }} 
-    }};
+        }};
 
-    if (document.readyState != 'loading') {{
-        initCascadeDropDownFor{0}();
-    }} else {{
-        document.addEventListener('DOMContentLoaded', initCascadeDropDownFor{0});
-    }}";
+        if (document.readyState != 'loading') {{
+            initCascadeDropDownFor{0}();
+        }} else {{
+            document.addEventListener('DOMContentLoaded', initCascadeDropDownFor{0});
+        }}";
 
         /// <summary>
         /// The create.

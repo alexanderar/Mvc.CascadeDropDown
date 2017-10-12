@@ -144,27 +144,27 @@ namespace Mvc.CascadeDropDown.Infrastructure
             return null;
         }
 
-        /// <summary>
-        /// The get member info.
-        /// </summary>
-        /// <param inputName="propSelector">
-        /// The prop selector.
-        /// </param>
-        /// <param name="propSelector">
-        /// The prop Selector.
-        /// </param>
-        /// <typeparam inputName="TModel">
-        /// </typeparam>
-        /// <typeparam inputName="TProp">
-        /// </typeparam>
-        /// <returns>
-        /// The <see cref="MemberInfo"/>.
-        /// </returns>
-        public static MemberInfo GetMemberInfo<TModel, TProp>(Expression<Func<TModel, TProp>> propSelector)
-        {
-            var body = propSelector.Body as MemberExpression;
-            return body?.Member;
-        }
+        ///// <summary>
+        ///// The get member info.
+        ///// </summary>
+        ///// <param inputName="propSelector">
+        ///// The prop selector.
+        ///// </param>
+        ///// <param name="propSelector">
+        ///// The prop Selector.
+        ///// </param>
+        ///// <typeparam inputName="TModel">
+        ///// </typeparam>
+        ///// <typeparam inputName="TProp">
+        ///// </typeparam>
+        ///// <returns>
+        ///// The <see cref="MemberInfo"/>.
+        ///// </returns>
+        //public static MemberInfo GetMemberInfo<TModel, TProp>(Expression<Func<TModel, TProp>> propSelector)
+        //{
+        //    var body = propSelector.Body as MemberExpression;
+        //    return body?.Member;
+        //}
 
         /// <summary>
         /// The get prop string value.
