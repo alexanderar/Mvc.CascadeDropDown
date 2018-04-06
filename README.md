@@ -35,3 +35,7 @@
 
 ### v2.0.1
 * Fix for dropdown id resolving when using nested models (https://github.com/alexanderar/Mvc.CascadeDropDown/issues/26)
+
+### v2.0.2
+* Fix for possible NullReferenceException when using nested classes in model (https://github.com/alexanderar/Mvc.CascadeDropDown/issues/29)
+* URI encode drop down values prior to sending them via GET request. Fix for https://github.com/alexanderar/Mvc.CascadeDropDown/issues/30
