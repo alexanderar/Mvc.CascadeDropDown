@@ -116,6 +116,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\CascadingDropDownContainerModel.cs" />
     <Compile Include="Models\MultipleDependenciesModel.cs" />
     <Compile Include="Models\CascadingDropdownsModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

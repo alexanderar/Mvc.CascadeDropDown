@@ -1,11 +1,10 @@
 ﻿
 @using Mvc.CascadeDropDown
-@model Mvc.CascadeDropDown.Test.Models.CascadingDropdownsModel
+@model Mvc.CascadeDropDown.Test.Models.CascadingDropDownContainerModel
 
 
 <script>
-    function beforeSend(json)
-    {
+    function beforeSend(json) {
         json.currency = json.country == "US" ? "USD" : "GBP";
         alert("<p><strong>Going to send:</strong></p><p><small>" + JSON.stringify(json, null, "\t") + "</small></p>", "BeforeSend callback", "success");
         return json;
@@ -16,8 +15,7 @@
             msg = "<small>" + JSON.stringify(data, null, "\t") + "</small>";
             alert(msg, "Successfull onComplete callback", "info");
         }
-        if (error)
-        {
+        if (error) {
             msg = "<p><strong>Got Error:</strong>></p><p>" + error + "</p>";
             alert(msg, "Error onComplete callback", "info");
         }
@@ -46,13 +44,25 @@
 
     <div class="form-horizontal">
         <div class="form-group">
-
-            @Html.DropDownListFor(m => m.SelectedCountry, Model.Countries, "Please select a Country", new { @class = "form-control" })
-            @Html.ValidationMessageFor(m => m.SelectedCountry)
+            @{
+                var countries = new List<SelectListItem> {
+                  new SelectListItem
+                {
+                    Text = "US",
+                    Value = "US"
+                },
+                new SelectListItem
+                {
+                    Text = "UK",
+                    Value = "UK"
+                }};
+            }
+            @Html.DropDownListFor(m => m.SubModel.SelectedCountry, countries, "Please select a Country", new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.SubModel.SelectedCountry)
         </div>
         <div class="form-group">
-            @Html.CascadingDropDownListFor(expression: m => m.SelectedCity,
-                                triggeredByProperty: m => m.SelectedCountry,
+            @Html.CascadingDropDownListFor(expression: m => m.SubModel.SelectedCity,
+                                triggeredByProperty: m => m.SubModel.SelectedCountry,
                                 url: Url.Action("GetCities", "Home"),
                                 ajaxActionParamName: "country",
                                 disabledWhenParentNotSelected: true,
@@ -65,17 +75,17 @@
                                     OnFailureGetData = "onFailure",
                                     OnSuccessGetData = "onSuccess"
                                 })
-            @Html.ValidationMessageFor(m => m.SelectedCity)
+            @Html.ValidationMessageFor(m => m.SubModel.SelectedCity)
         </div>
         <div class="form-group">
-            @Html.CascadingDropDownListFor(m => m.SelectedStreet, m => m.SelectedCity, Url.Action("GetStreets", "Home"), "city", "Please select a Street", true, new { @class = "form-control" }, new CascadeDropDownOptions
-           {
-               OnFailureGetData = "onFailure",
-           })
-            @Html.ValidationMessageFor(m => m.SelectedStreet)
+            @Html.CascadingDropDownListFor(m => m.SubModel.SelectedStreet, m => m.SubModel.SelectedCity, Url.Action("GetStreets", "Home"), "city", "Please select a Street", true, new { @class = "form-control" }, new CascadeDropDownOptions
+       {
+           OnFailureGetData = "onFailure",
+       })
+            @Html.ValidationMessageFor(m => m.SubModel.SelectedStreet)
         </div>
     </div>
 
     <input type="submit" value="Submit" class="btn btn-primary" />
 
-}
+                }

@@ -20,6 +20,5 @@ namespace Mvc.CascadeDropDown.Test.Models
 
         [Required]
         public int? SelectedStreet { get; set; }
-
     }
 }

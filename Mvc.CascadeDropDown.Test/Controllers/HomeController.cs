@@ -56,27 +56,27 @@ namespace Mvc.CascadeDropDown.Test.Controllers
 
         public ActionResult Index()
         {
-            var model = new CascadingDropdownsModel
-            {
-                Countries =
-                    new List<SelectListItem>
-                    {
-                        new SelectListItem
-                        {
-                            Text = "US",
-                            Value = "US"
-                        },
-                        new SelectListItem
-                        {
-                            Text = "UK",
-                            Value = "UK"
-                        },
-                    },
-                    SelectedCountry = "US",
-                    SelectedCity = "New York",
-                    //SelectedStreet = 2
-            };
-            return View(model);
+            //var model = new CascadingDropdownsModel
+            //{
+            //    Countries =
+            //        new List<SelectListItem>
+            //        {
+            //            new SelectListItem
+            //            {
+            //                Text = "US",
+            //                Value = "US"
+            //            },
+            //            new SelectListItem
+            //            {
+            //                Text = "UK",
+            //                Value = "UK"
+            //            },
+            //        },
+            //        SelectedCountry = "US",
+            //        SelectedCity = "New York",
+            //        //SelectedStreet = 2
+            //};
+            return View(new CascadingDropDownContainerModel());
         }
 
         public ActionResult GetCities(string country, string currency)
@@ -85,8 +85,8 @@ namespace Mvc.CascadeDropDown.Test.Controllers
             {
                 var cities = new List<SelectListItem>
                 {
-                    new SelectListItem {Text = "New York", Value = "New York"},
-                    new SelectListItem {Text = "Los Angeles", Value = "Los Angeles", Disabled = true},
+                    new SelectListItem {Text = "New York", Value = "New&York"},
+                    new SelectListItem {Text = "Los Angeles", Value = "Los&Angeles", Disabled = true},
                     new SelectListItem {Text = "Boston", Value = "Boston", Selected = true}
                 };
                 return Json(cities, JsonRequestBehavior.AllowGet);

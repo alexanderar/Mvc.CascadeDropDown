@@ -73,7 +73,7 @@ namespace Mvc.CascadeDropDown
         private const string Js3InitializeGetRequest =
           @"var request = new XMLHttpRequest();            
             var url = targetElement.dataset.cascadeDdUrl;var appndSgn = url.indexOf('?') > -1 ? '&' : '?';
-            var qs = Object.keys(jsonToSend).map(function(key){return key+'='+jsonToSend[key]}).join('&');
+            var qs = Object.keys(jsonToSend).map(function(key){return key+'='+encodeURIComponent(jsonToSend[key])}).join('&');
             request.open('GET', url+appndSgn+qs, true);";
 
         /// <summary>
@@ -530,7 +530,7 @@ namespace Mvc.CascadeDropDown
             string stringVal = null;
             if (src != null)
             {
-                object propVal = src.GetType().GetProperty(propName).GetValue(src, null);
+                var propVal = src.GetType().GetProperty(propName).GetValue(src, null);
                 stringVal = propVal != null ? propVal.ToString() : null;
             }
             return stringVal;
@@ -538,19 +538,23 @@ namespace Mvc.CascadeDropDown
 
         private static string GetPropStringValue<TModel, TProp>(TModel src, Expression<Func<TModel, TProp>> expression)
         {
-            Func<TModel, TProp> func = expression.Compile();
+            var func = expression.Compile();
             var selectedValString = string.Empty;
-            if (src != null)
-            {
-                TProp propVal = func(src);
-                string defaultValString = typeof(TProp).IsValueType && Nullable.GetUnderlyingType(typeof(TProp)) == null
-                    ? Activator.CreateInstance(typeof(TProp)).ToString()
-                    : string.Empty;
-                if ((defaultValString != string.Empty && propVal.ToString() != defaultValString) ||
-                    (defaultValString == string.Empty && propVal != null))
+            var defaultValString = typeof(TProp).IsValueType && Nullable.GetUnderlyingType(typeof(TProp)) == null
+                       ? Activator.CreateInstance(typeof(TProp)).ToString()
+                       : string.Empty;
+            try {
+                if (src != null)
                 {
-                    selectedValString = propVal.ToString();
+                    var propVal = func(src);
+                    if ((defaultValString != string.Empty && propVal.ToString() != defaultValString) ||
+                        (defaultValString == string.Empty && propVal != null))
+                    {
+                        selectedValString = propVal.ToString();
+                    }
                 }
+            } catch (Exception) {
+                selectedValString = defaultValString;
             }
             return selectedValString;
         }
