@@ -93,6 +93,7 @@ namespace Mvc.CascadeDropDown
                         data.forEach(function(item, i) {{
                             items += '<option value=""' + item.Value + '""'
                             if(item.Disabled){{items += ' disabled'}}
+                            if(item.Selected){{items += ' selected'}}
                             items += '>' + item.Text + '</option>';
                         }});
                         targetElement.innerHTML = items;
