@@ -25,7 +25,7 @@ namespace Mvc.CascadeDropDown
         var triggerElement = document.getElementById('{1}');
         var targetElement = document.getElementById('{0}');
         var preselectedValue = '{2}';
-        triggerElement.onchange = function(e) {{
+        var triggerElementChanged = function(e) {{
             {3}
             var value = triggerElement.value;
             var items = {4};
@@ -122,34 +122,33 @@ namespace Mvc.CascadeDropDown
         /// {0} -  will have a call to CascadeDropDownOptions.OnCompleteGetData if it was set.
         /// {1} -  will have a call to CascadeDropDownOptions.OnFailureGetData if it was set.
         /// </summary>
-        private const string Js5ErrorCallback = 
+        private const string Js5ErrorCallback =
             @"request.onerror = function () {{
                 {0}{1}
             }};";
 
 
         /// <summary>
-        /// 6 in order CONDITIONAL        
+        /// 6 in order CONDITIONAL
         /// </summary>
         private const string Js6SendPostRequest =
          @"request.send(JSON.stringify(jsonToSend));";
 
         /// <summary>
-        /// 6 in order CONDITIONAL        
+        /// 6 in order CONDITIONAL
         /// </summary>
         private const string Js6SendGetRequest = @"request.send();";
 
         /// <summary>
-        /// Last in order 
+        /// Last in order
         /// {0} - cascading dropdown element Id
         /// </summary>
         private const string Js7EndFormat = @"
         }};
+        triggerElement.addEventListener('change', triggerElementChanged);
         if(triggerElement.value && !targetElement.value)
         {{
-            var event = document.createEvent('HTMLEvents');
-            event.initEvent('change', true, false);
-            triggerElement.dispatchEvent(event);           
+            triggerElementChanged();
         }} 
     }};
 
@@ -205,12 +204,12 @@ namespace Mvc.CascadeDropDown
                         data.forEach(function(item, i) {{
                             items += '<option value=""' + item.Value + '"">' + item.Text + '</option>';
                         }});
-                        targetElement.innerHTML = items;  
+                        targetElement.innerHTML = items;
                         if(preselectedValue)
                         {{
                             targetElement.value = preselectedValue;
                             preselectedValue = null;
-                        }}  
+                        }}
                         var event = document.createEvent('HTMLEvents');
                         event.initEvent('change', true, false);
                         targetElement.dispatchEvent(event);
@@ -223,16 +222,16 @@ namespace Mvc.CascadeDropDown
             request.onerror = function (error) {{
                 console.log(error);
             }};
-           
-            {8}                        
+
+            {8}
             request.send(JSON.stringify(jsonToSend));
         }});
         if(triggerElement.value && !targetElement.value)
         {{
             var event = document.createEvent('HTMLEvents');
             event.initEvent('change', true, false);
-            triggerElement.dispatchEvent(event);           
-        }} 
+            triggerElement.dispatchEvent(event);
+        }}
     }};
 
     if (document.readyState != 'loading') {{
@@ -241,7 +240,7 @@ namespace Mvc.CascadeDropDown
         document.addEventListener('DOMContentLoaded', initCascadeDropDownFor{4});
     }}
 </script>";
-       
+
         public static MvcHtmlString CascadingDropDownList<TModel, TProperty>(
             this HtmlHelper<TModel> htmlHelper,
             string inputName,
@@ -250,7 +249,7 @@ namespace Mvc.CascadeDropDown
             string url,
             string ajaxActionParamName,
             string optionLabel = null,
-            bool disabledWhenParentNotSelected = false,           
+            bool disabledWhenParentNotSelected = false,
             object htmlAttributes = null,
             CascadeDropDownOptions options = null)
         {
@@ -268,7 +267,7 @@ namespace Mvc.CascadeDropDown
                 url,
                 ajaxActionParamName,
                 optionLabel,
-                disabledWhenParentNotSelected,                
+                disabledWhenParentNotSelected,
                 htmlAttributes,
                 options);
         }
@@ -281,7 +280,7 @@ namespace Mvc.CascadeDropDown
             string url,
             string ajaxActionParamName,
             string optionLabel = null,
-            bool disabledWhenParentNotSelected = false,           
+            bool disabledWhenParentNotSelected = false,
             object htmlAttributes = null,
             CascadeDropDownOptions options = null)
         {
@@ -295,10 +294,10 @@ namespace Mvc.CascadeDropDown
                 ajaxActionParamName,
                 GetPropStringValue(htmlHelper.ViewData.Model, inputName),
                 optionLabel,
-                disabledWhenParentNotSelected,                
+                disabledWhenParentNotSelected,
                 htmlAttributes != null
                 ? HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes)
-                : new RouteValueDictionary(), 
+                : new RouteValueDictionary(),
                 options);
         }
 
@@ -440,12 +439,12 @@ namespace Mvc.CascadeDropDown
             }
 
             if (disabledWhenParentNotSelected)
-            {               
+            {
                 htmlAttributes.Add("disabled", "disabled");
                 setDisableString = "targetElement.setAttribute('disabled','disabled');";
                 removeDisabledString = "targetElement.removeAttribute('disabled');";
             }
-           
+
             var defaultDropDownHtml = htmlHelper.DropDownList(
                 inputName,
                 new List<SelectListItem>(),
@@ -476,7 +475,7 @@ namespace Mvc.CascadeDropDown
         {
             builder.Append(options == null || options.HttpMethod == null || !options.HttpMethod.Equals("POST", StringComparison.OrdinalIgnoreCase) ?
                 Js3InitializeGetRequest : Js3InitializePostRequest);
-        }      
+        }
 
         private static void ApplyOnLoadString(ref StringBuilder builder, CascadeDropDownOptions options)
         {
