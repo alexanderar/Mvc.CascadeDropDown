@@ -40,6 +40,6 @@
 * Fix for possible NullReferenceException when using nested classes in model (https://github.com/alexanderar/Mvc.CascadeDropDown/issues/29)
 * URI encode drop down values prior to sending them via GET request. Fix for https://github.com/alexanderar/Mvc.CascadeDropDown/issues/30
 
-### v2.0.2
+### v2.0.3
 * Fix for Multiple Dropdowns dependent on same "Master" (https://github.com/alexanderar/Mvc.CascadeDropDown/issues/28)
 * Fix for Selected attribute does not work on cascading drop down(https://github.com/alexanderar/Mvc.CascadeDropDown/issues/32)
