@@ -530,8 +530,12 @@ namespace Mvc.CascadeDropDown
             string stringVal = null;
             if (src != null)
             {
-                var propVal = src.GetType().GetProperty(propName).GetValue(src, null);
-                stringVal = propVal != null ? propVal.ToString() : null;
+                var prop = src.GetType().GetProperty(propName);
+                if(prop != null)
+                {
+                    var propVal = prop.GetValue(src, null);
+                    stringVal = propVal != null ? propVal.ToString() : null;
+                }
             }
             return stringVal;
         }
