@@ -302,6 +302,36 @@ namespace Mvc.CascadeDropDown
                 options);
         }
 
+        public static MvcHtmlString CascadingDropDownList(
+            this HtmlHelper htmlHelper,
+            string inputName,
+            string inputId,
+            string triggeredByProperty,
+            string url,
+            string ajaxActionParamName,
+            string selectedValue,
+            string optionLabel = null,
+            bool disabledWhenParentNotSelected = false,
+            object htmlAttributes = null,
+            CascadeDropDownOptions options = null)
+        {
+
+            return CascadingDropDownList(
+                htmlHelper,
+                inputName,
+                inputId,
+                triggeredByProperty,
+                url,
+                ajaxActionParamName,
+                selectedValue,
+                optionLabel,
+                disabledWhenParentNotSelected,
+                htmlAttributes != null
+                ? HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes)
+                : new RouteValueDictionary(),
+                options);
+        }        
+        
         public static MvcHtmlString CascadingDropDownListFor<TModel, TProperty, TProperty2>(
             this HtmlHelper<TModel> htmlHelper,
             Expression<Func<TModel, TProperty>> expression,
